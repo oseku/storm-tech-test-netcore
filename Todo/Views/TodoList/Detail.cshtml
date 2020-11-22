@@ -12,64 +12,134 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<div class="col-md-6">
+<div class="col-md-8">
+    <div class="list-group">
 
-    <ul class="list-group">
+        <div class="row list-group-item">
+            <div class="col-md-4">
+                <a asp-action="Create" asp-controller="TodoItem" asp-route-todoListId="@Model.TodoListId">
+                    <strong>Add New Item</strong>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <label for="displayDoneItems">Show finished items</label>
+                <input type="checkbox" id="displayDoneItems" checked />
+            </div>
+            <div class="col-md-4">
+                <label for"orderBy">Order by</label>
+                <select id="orderBy">
+                    <option value="importance">Importance</option>
+                    <option value="importance-desc" selected>Importance descending</option>
+                    <option value="rank">Rank</option>
+                    <option value="rank-desc">Rank descending</option>
+                </select>
+            </div>
+        </div>
 
-        <li class="list-group-item">
-            <div class="row">
+        <div class="items">
+            @foreach (var item in Model.Items.OrderBy(x => x.Importance))
+            {
+                string contextualClass = ContextualClass(item);
+
+            <div class="row list-group-item @contextualClass" data-rank="@item.Rank" data-importance="@(item.Importance)" data-item>
+
                 <div class="col-md-4">
-                    <a asp-action="Create" asp-controller="TodoItem" asp-route-todoListId="@Model.TodoListId">
-                        <strong>Add New Item</strong>
+                    <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
+
+                        @if (item.IsDone)
+                        {
+                            <s>@item.Title</s>
+                        }
+                        else
+                        {
+                            <text>@item.Title</text>
+                        }
                     </a>
                 </div>
+
+                <div class="col-md-2">
+                    <small>
+                        @Html.DisplayNameFor(i => @item.Rank)&nbsp;@item.Rank
+                    </small>
+                </div>
+
                 <div class="col-md-6 text-right">
-                    <label for="displayDoneItems">Show finished items</label>
-                    <input type="checkbox" id="displayDoneItems" checked />
+                    <small>
+                        @item.ResponsibleParty.UserName
+
+                        <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30" />
+
+                    </small>
                 </div>
             </div>
-        </li>
 
-        @foreach (var item in Model.Items.OrderBy(x => x.Importance))
-        {
-            string contextualClass = ContextualClass(item);
-
-            <li class="list-group-item @contextualClass">
-
-                <div class="row">
-
-                    <div class="col-md-8">
-                        <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
-
-                            @if (item.IsDone)
-                            {
-                                <s>@item.Title</s>
-                            }
-                            else
-                            {
-                                <text>@item.Title</text>
-                            }
-                        </a>
-                    </div>
-
-                    <div class="col-md-4 text-right">
-                        <small>
-                            @item.ResponsibleParty.UserName
-
-                            <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30" />
-
-                        </small>
-                    </div>
-                </div>
-
-            </li>
-        }
-    </ul>
+            }
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script type="text/javascript">
-        $('#displayDoneItems').change(function () { this.checked ? $('.done').show() : $('.done').hide(); });
+        function DetailPage() {
+            const _orderBy = function (compare) {
+                const items = $('[data-item]').toArray();
+                items.sort(compare);
+                $('.items').empty();
+                items.forEach(function (item) { $('.items').append($(item)) });
+            }
+
+            $('#displayDoneItems').change(function () { this.checked ? $('.done').show() : $('.done').hide(); });
+            $('#orderBy').change(function () {
+                const comparator = ItemCopmarator();
+                switch ($(this).val()) {
+                    case 'importance':
+                        _orderBy(comparator.byImportance);
+                        break;
+                    case 'importance-desc':
+                        _orderBy(comparator.byImportanceDesc);
+                        break;
+                    case 'rank':
+                        _orderBy(comparator.byRank);
+                        break;
+                    case 'rank-desc':
+                        _orderBy(comparator.byRankDesc);
+                        break;
+                }
+            });
+        }
+
+        function ItemCopmarator() {
+            const Importance = {
+                "High": 0,
+                "Medium": 1,
+                "Low": 2
+            }
+
+            const byImportance = function (a, b) {
+                return Importance[b.dataset.importance] - Importance[a.dataset.importance];
+            }
+
+            const byImportanceDesc = function (a, b) {
+                return Importance[a.dataset.importance] - Importance[b.dataset.importance];
+            }
+
+            const byRank = function (a, b) {
+                return a.dataset.rank - b.dataset.rank;
+            }
+
+            const byRankDesc = function (a, b) {
+                return b.dataset.rank - a.dataset.rank;
+            }
+
+            return {
+                byImportance,
+                byImportanceDesc,
+                byRank,
+                byRankDesc
+            }
+        }
+
+        DetailPage();
     </script>
 }
 

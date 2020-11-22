@@ -1,10 +1,12 @@
-﻿@using Todo.Controllers
+﻿@using Todo.Data
 @using Todo.Data.Entities
 @using Todo.Services
 @using System.Text
 @using Todo.Models.TodoItems
 
 @model Todo.Models.TodoLists.TodoListDetailViewmodel
+
+@inject ApplicationDbContext dbContext
 
 @{
     ViewData["Title"] = $"List: {Model.Title}";
@@ -17,7 +19,7 @@
 
         <div class="row list-group-item">
             <div class="col-md-4">
-                <a asp-action="Create" asp-controller="TodoItem" asp-route-todoListId="@Model.TodoListId">
+                <a href="#create-item-modal" id="create-item-action">
                     <strong>Add New Item</strong>
                 </a>
             </div>
@@ -78,7 +80,40 @@
     </div>
 </div>
 
+<div id="create-item-modal" class="modal">
+    @{
+        var todoList = dbContext.SingleTodoList(Model.TodoListId);
+        var fields = Todo.EntityModelMappers.TodoItems.TodoItemCreateFieldsFactory.Create(todoList, User.Id());
+    }
+    @await Html.PartialAsync("_CreateNewItemPartial", fields)
+</div>
+
 @section Scripts {
+
+    <!-- jQuery Modal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <!-- /jQuery Modal -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript">
+        $('#create-item-action').click(function (e) {
+            event.preventDefault();
+            this.blur(); // Manually remove focus from clicked link.
+            $('#create-item-modal').modal({ showClose: false});
+
+        });
+        function clear() {
+            $('#create-item-modal #Title').val('');
+            $('#create-item-modal #Importance').val('Medium');
+            $('#create-item-modal #ResponsiblePartyId').val('');
+
+            $.modal.close();
+        }
+
+    </script>
+
     <script type="text/javascript" src="~/js/Pages/TodoList/DetailPage.js"></script>
 }
 

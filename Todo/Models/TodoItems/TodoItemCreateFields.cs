@@ -5,10 +5,12 @@ namespace Todo.Models.TodoItems
 {
     public class TodoItemCreateFields
     {
+        [Required]
         public int TodoListId { get; set; }
+        [Required]
         public string Title { get; set; }
         public string TodoListTitle { get; set; }
-        [Display(Name = "Responsible person")]
+        [Required, Display(Name = "Responsible person")]
         public string ResponsiblePartyId { get; set; }
         public Importance Importance { get; set; } = Importance.Medium;
 

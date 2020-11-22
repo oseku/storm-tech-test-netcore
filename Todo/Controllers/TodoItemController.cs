@@ -31,14 +31,14 @@ namespace Todo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TodoItemCreateFields fields)
         {
-            if (!ModelState.IsValid) { return View(fields); }
+            if (!ModelState.IsValid) { return BadRequest(fields); }
 
             var item = new TodoItem(fields.TodoListId, fields.ResponsiblePartyId, fields.Title, fields.Importance, 0);
 
             await dbContext.AddAsync(item);
             await dbContext.SaveChangesAsync();
 
-            return RedirectToListDetail(fields.TodoListId);
+            return Ok(item);
         }
 
         [HttpGet]

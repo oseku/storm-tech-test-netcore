@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,15 +14,23 @@ namespace Todo.Services
         {
             _http = httpClient;
             _http.DefaultRequestHeaders.Add("User-Agent", "Todo lsit"); //gravatar returns 403 without User-Agent...
+            _http.Timeout = TimeSpan.FromMilliseconds(2000);    // cancel request if service is slow or unavailable
         }
 
         public async Task<dynamic> GetProfile(string hash)
         {
-            var response = await _http.GetAsync($"https://www.gravatar.com/{hash}.json");
+            try
+            {
+                var response = await _http.GetAsync($"https://www.gravatar.com/{hash}.json");
 
-            return response.IsSuccessStatusCode
-                ? await response.Content.ReadAsAsync<dynamic>()
-                : null;
+                return response.IsSuccessStatusCode
+                    ? await response.Content.ReadAsAsync<dynamic>()
+                    : null;
+            }
+            catch    // empty catch on purpose 
+            {
+                return null;
+            }
         }
 
         public static string GetHash(string emailAddress)

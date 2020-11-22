@@ -1,6 +1,9 @@
 ﻿@using Todo.Controllers
 @using Todo.Data.Entities
 @using Todo.Services
+@using System.Text
+@using Todo.Models.TodoItems
+
 @model Todo.Models.TodoLists.TodoListDetailViewmodel
 
 @{
@@ -21,49 +24,61 @@
 
         @foreach (var item in Model.Items.OrderBy(x => x.Importance))
         {
-            string contextualClass;
-            switch (item.Importance)
-            {
-                case Importance.High:
-                    contextualClass = "list-group-item-danger";
-                    break;
-                case Importance.Low:
-                    contextualClass = "list-group-item-info";
-                    break;
-                default:
-                    contextualClass = "";
-                    break;
-            }
+            string contextualClass = ContextualClass(item);
 
             <li class="list-group-item @contextualClass">
-                
+
                 <div class="row">
 
-                <div class="col-md-8">
-                    <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
+                    <div class="col-md-8">
+                        <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
 
-                        @if (item.IsDone)
-                        {
-                            <s>@item.Title</s>
-                        }
-                        else
-                        {
-                            <text>@item.Title</text>
-                        }
-                    </a>
-                </div>
+                            @if (item.IsDone)
+                            {
+                                <s>@item.Title</s>
+                            }
+                            else
+                            {
+                                <text>@item.Title</text>
+                            }
+                        </a>
+                    </div>
 
-                <div class="col-md-4 text-right">
-                    <small>
-                        @item.ResponsibleParty.UserName
+                    <div class="col-md-4 text-right">
+                        <small>
+                            @item.ResponsibleParty.UserName
 
-                        <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30"/>
+                            <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30" />
 
-                    </small>
-                </div>
+                        </small>
+                    </div>
                 </div>
 
             </li>
         }
     </ul>
 </div>
+
+@functions {
+    string ContextualClass(TodoItemSummaryViewmodel item)
+    {
+        StringBuilder builder = new StringBuilder();
+        switch (item.Importance)
+        {
+            case Importance.High:
+                builder.Append("list-group-item-danger");
+                break;
+            case Importance.Low:
+                builder.Append("list-group-item-info");
+                break;
+            default:
+                break;
+        }
+
+        if (item.IsDone)
+            builder.Append(" done");
+
+        return builder.ToString();
+    }
+
+}

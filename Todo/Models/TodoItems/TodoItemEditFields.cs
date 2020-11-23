@@ -6,12 +6,13 @@ namespace Todo.Models.TodoItems
     {
         public int TodoItemId { get; set; }
         public bool IsDone { get; set; }
-        public int Rank { get; set; }
-
+        
 
         public TodoItemEditFields() { }
 
-        public TodoItemEditFields(int todoListId, string todoListTitle, int todoItemId, string title, bool isDone, string responsiblePartyId, Importance importance, int rank)
+        public TodoItemEditFields(int todoListId, string todoListTitle, int todoItemId, 
+                                  string title, bool isDone, string responsiblePartyId, 
+                                  Importance importance, int rank)
             : base(todoListId, todoListTitle, responsiblePartyId)
         {
             TodoItemId = todoItemId;

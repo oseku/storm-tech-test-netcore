@@ -13,6 +13,7 @@ namespace Todo.Models.TodoItems
         [Required, Display(Name = "Responsible person")]
         public string ResponsiblePartyId { get; set; }
         public Importance Importance { get; set; } = Importance.Medium;
+        public int Rank { get; set; }
 
         public TodoItemCreateFields() { }
 

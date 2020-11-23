@@ -16,8 +16,9 @@
               data-ajax="true"
               data-ajax-method="post"
               data-ajax-url="@Url.Action("Create", "TodoItem")"
-              data-ajax-success="clear"
-              >
+              data-ajax-success="closeModal"
+              data-ajax-update="#items-list"
+              data-ajax-mode="after">
 
             @Html.AntiForgeryToken()
 

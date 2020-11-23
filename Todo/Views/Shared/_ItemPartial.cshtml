@@ -1,0 +1,65 @@
+﻿@using Todo.Models.TodoItems
+@using Todo.Services
+@using System.Text
+@using Todo.Data
+@using Todo.Data.Entities
+@model IEnumerable<TodoItemSummaryViewmodel>
+
+@foreach (var item in Model)
+{
+    <div class="row list-group-item @ContextualClass(item)" data-rank="@item.Rank" data-importance="@(item.Importance)" data-item>
+
+        <div class="col-md-4">
+            <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
+
+                @if (item.IsDone)
+                {
+                    <s>@item.Title</s>
+                }
+                else
+                {
+                    <text>@item.Title</text>
+                }
+            </a>
+        </div>
+
+        <div class="col-md-2">
+            <small>
+                @Html.DisplayNameFor(i => item.Rank)&nbsp;@item.Rank
+            </small>
+        </div>
+
+        <div class="col-md-6 text-right">
+            <small>
+                @item.ResponsibleParty.UserName
+
+                <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30" />
+
+            </small>
+        </div>
+    </div>
+}
+
+@functions {
+    string ContextualClass(TodoItemSummaryViewmodel item)
+    {
+        StringBuilder builder = new StringBuilder();
+        switch (item.Importance)
+        {
+            case Importance.High:
+                builder.Append("list-group-item-danger");
+                break;
+            case Importance.Low:
+                builder.Append("list-group-item-info");
+                break;
+            default:
+                break;
+        }
+
+        if (item.IsDone)
+            builder.Append(" done");
+
+        return builder.ToString();
+    }
+
+}

@@ -1,10 +1,11 @@
-﻿function DetailPage() {
+﻿function ItemsList() {
     const _orderBy = function (compare) {
         const items = $('[data-item]').toArray();
         items.sort(compare);
         $('.items').empty();
         items.forEach(function (item) { $('.items').append($(item)) });
     }
+
 
     $('#displayDoneItems').change(function () { this.checked ? $('.done').show() : $('.done').hide(); });
     $('#orderBy').change(function () {
@@ -24,6 +25,7 @@
                 break;
         }
     });
+    
 }
 
 function ItemCopmarator() {
@@ -57,4 +59,32 @@ function ItemCopmarator() {
     }
 }
 
-DetailPage();
+function NewItemModal() {
+    const show = function (e) {
+        e.preventDefault();
+        this.blur(); // Manually remove focus from clicked link.
+        $(this).modal({ showClose: false });
+    };
+
+    const reset = function () {
+        $('#Title').val('');
+        $('#Importance').val('Medium');
+        $('#ResponsiblePartyId').val('');
+    }
+
+    const close = function () {
+        $.modal.close();
+    }
+
+    $('#create-item-action').click(show);
+
+    return { show, close, reset };
+}
+
+ItemsList();
+const modal = NewItemModal();
+
+function closeModal() {
+    modal.reset();
+    modal.close();
+}

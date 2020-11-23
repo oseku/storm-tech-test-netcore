@@ -38,44 +38,8 @@
             </div>
         </div>
 
-        <div class="items">
-            @foreach (var item in Model.Items.OrderBy(x => x.Importance))
-            {
-                string contextualClass = ContextualClass(item);
-
-                <div class="row list-group-item @contextualClass" data-rank="@item.Rank" data-importance="@(item.Importance)" data-item>
-
-                    <div class="col-md-4">
-                        <a asp-action="Edit" asp-controller="TodoItem" asp-route-todoItemId="@item.TodoItemId">
-
-                            @if (item.IsDone)
-                            {
-                                <s>@item.Title</s>
-                            }
-                            else
-                            {
-                                <text>@item.Title</text>
-                            }
-                        </a>
-                    </div>
-
-                    <div class="col-md-2">
-                        <small>
-                            @Html.DisplayNameFor(i => @item.Rank)&nbsp;@item.Rank
-                        </small>
-                    </div>
-
-                    <div class="col-md-6 text-right">
-                        <small>
-                            @item.ResponsibleParty.UserName
-
-                            <img src="https://www.gravatar.com/avatar/@Gravatar.GetHash(item.ResponsibleParty.Email)?s=30" />
-
-                        </small>
-                    </div>
-                </div>
-
-            }
+        <div id="items-list" class="items">
+            @await Html.PartialAsync("_ItemPartial", Model.Items.OrderBy(x => x.Importance))
         </div>
     </div>
 </div>
@@ -89,54 +53,10 @@
 </div>
 
 @section Scripts {
-
-    <!-- jQuery Modal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-    <!-- /jQuery Modal -->
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
     <partial name="_ValidationScriptsPartial" />
-    <script type="text/javascript">
-        $('#create-item-action').click(function (e) {
-            event.preventDefault();
-            this.blur(); // Manually remove focus from clicked link.
-            $('#create-item-modal').modal({ showClose: false});
-
-        });
-        function clear() {
-            $('#create-item-modal #Title').val('');
-            $('#create-item-modal #Importance').val('Medium');
-            $('#create-item-modal #ResponsiblePartyId').val('');
-
-            $.modal.close();
-        }
-
-    </script>
 
     <script type="text/javascript" src="~/js/Pages/TodoList/DetailPage.js"></script>
-}
-
-@functions {
-    string ContextualClass(TodoItemSummaryViewmodel item)
-    {
-        StringBuilder builder = new StringBuilder();
-        switch (item.Importance)
-        {
-            case Importance.High:
-                builder.Append("list-group-item-danger");
-                break;
-            case Importance.Low:
-                builder.Append("list-group-item-info");
-                break;
-            default:
-                break;
-        }
-
-        if (item.IsDone)
-            builder.Append(" done");
-
-        return builder.ToString();
-    }
-
 }

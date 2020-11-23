@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using Todo.Data;
 using Todo.Data.Entities;
 using Todo.EntityModelMappers.TodoItems;
@@ -34,11 +34,12 @@ namespace Todo.Controllers
             if (!ModelState.IsValid) { return BadRequest(fields); }
 
             var item = new TodoItem(fields.TodoListId, fields.ResponsiblePartyId, fields.Title, fields.Importance, 0);
-
             await dbContext.AddAsync(item);
             await dbContext.SaveChangesAsync();
 
-            return Ok(item);
+            return PartialView("_ItemPartial",
+                   new[] { TodoItemSummaryViewmodelFactory.Create(dbContext.SingleTodoItem(item.TodoItemId)) }
+                    );
         }
 
         [HttpGet]
